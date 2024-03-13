@@ -42,14 +42,11 @@ datatype_dictionnary = {
 
 datatype = null
 
-
-
-
-
+cancel = 0
 
 #Format stockage des données (pour le moment)
-main_data = [date, time, sensorID, sensor_value, datatype_dictionnary[datatype]]
-
+main_data = []
+main_dataInstant = (date, time, sensorID, sensor_value, datatype_dictionnary[datatype])
 #commandes d'aides
 def help_datatypes():
     print("Voici les différents types de données enregistrés.")
@@ -71,60 +68,106 @@ def help_datatypes():
 
 #Ajotuer manuellement une donnée au tableau
 def add_data():
+    global cancel
+    cancel = 0
     def_date()
     def_time()
     def_sensorData()
-    main_data.append[date, time, sensorID, sensor_value, datatype_dictionnary[datatype]]
+    def_datatype()
+    if cancel == 1:
+        print("quit !")
+        return
+    main_dataInstant = (date, time, sensorID, sensor_value, datatype_dictionnary[datatype])
+    main_data.append(main_dataInstant)
     print("New data has been stored in database.")
     print(main_data[-1])
     print("executez ................... pour voir les données")
 
 
 def def_date():
+    global date, cancel
     date_box = input("Donne date avec ce format jj/mm/aaaa")
+    if date_box == "quit":
+        cancel = 1
+        return
     day,month,year = date_box.split('/') #Séparation des données entrées par l'utilisateur
     day = int(day)
     month = int(month)
     year = int(year)
-    if day > 31 or day < 1:
+    if not (1 <= day <= 31):
         print("La date n'est pas comprise entre 1 et 31 ! Merci de réessayer")
         def_date()
-        return None
-    if month > 12 or month < 1:
+        return 
+    if not (1 <= month <= 12):
         print("Le mois n'est pas compris entre 1 et 12 ! Merci de réessayer")
         def_date()
-        return None
-    def_time
+        return 
+    date = (day,month,year)
+    return 
     
 def def_time():  
+    global time, cancel
+    if cancel == 1:
+        return
     time_box = input("Donne date avec ce format hh:mm:ss")
+    if time_box == "quit":
+        cancel = 1
+        return
     hours,minutes,seconds = time_box.split(':')
     hours = int(hours)
     minutes = int(minutes)
     seconds = int(seconds)
-    if hours > 24 or day < 1:
+    if not (1 <= hours <= 24):
         print("Il n'y a que 24h dans une journée ! Merci de réessayer")
         def_time()
-        return None
-    if minutes > 60 or minutes < 1:
+        return 
+    if not (0 <= minutes < 60):
         print("Les minutes ne sont pas comprises entre 1 et 60 ! Merci de réessayer")
         def_time()
-        return None
-    if seconds > 60 or seconds < 1:
+        return 
+    if not (0 <= seconds < 60):
         print("Les secondes ne sont pas comprises entre 1 et 60 ! Merci de réessayer")
         def_time()
-        return None
-    print("Nous allons maintenant entrer les données du capteur")
-    def_sensorData()
+        return 
+    time = (hours,minutes,seconds)
+    return 
 
-def def_sensorData ():
+def def_sensorData():
+    global cancel
+    if cancel == 1:
+        return
+    global sensorID, sensor_value, datatype
     sensorID = input("Donne identifiant sensor")
+    if sensorID == "quit":
+        cancel = 1
+        return
     sensor_value = input("donne valeur du capteur")
+    if sensor_value == "quit":
+        cancel = 1
+        return
     datatype = input("Donne type de donnée, executez help_datatypes pour avoir une liste des types de données.")
+    if datatype == "quit":
+        cancel = 1
+        return
+    return 
+
+def def_datatype():
+    global datatype, cancel
+    if cancel == 1:
+        return
+    datatype = input("Donne type de donnée, executez help_datatypes pour avoir une liste des types de données.")
+    if datatype == "quit":
+        cancel = 1
+        return
+    if datatype not in datatype_dictionnary:
+        print(f"Type de donnée invalide : {datatype}. Veuillez utiliser un identifiant valide.")
+        help_datatypes()
+        def_datatype()
 
 
 
 
+# =====friendly commands===== 
 # Un dictionnaire associant les commandes de l'utilisateur aux fonctions correspondantes
 commands = {
     "help datatypes": help_datatypes,
