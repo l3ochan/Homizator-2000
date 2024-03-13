@@ -145,25 +145,36 @@ def def_sensorData():
     if sensor_value == "quit":
         cancel = 1
         return
-    datatype = input("Donne type de donnée, executez help_datatypes pour avoir une liste des types de données.")
-    if datatype == "quit":
-        cancel = 1
-        return
     return 
 
 def def_datatype():
     global datatype, cancel
     if cancel == 1:
         return
-    datatype = input("Donne type de donnée, executez help_datatypes pour avoir une liste des types de données.")
+    datatype_input = input("Donne type de donnée, executez help_datatypes pour avoir une liste des types de données.")
     if datatype == "quit":
         cancel = 1
         return
-    if datatype not in datatype_dictionnary:
-        print(f"Type de donnée invalide : {datatype}. Veuillez utiliser un identifiant valide.")
-        help_datatypes()
-        def_datatype()
+    datatype_mapping = {
+        "null": null,
+        "temp": temp,
+        "lum": lum,
+        "hum": hum,
+        "co2": co2,
+        "air": air,
+        "son": son,
+        "atm": atm,
+        "conso": conso
+    }
 
+    # Utilise le mapping pour obtenir la valeur entière correspondante
+    if datatype_input in datatype_mapping:
+        datatype = datatype_mapping[datatype_input]
+    else:
+        print("Type de donnée inconnu. Merci de réessayer")
+        help_datatypes
+        def_datatype
+        
 
 
 
