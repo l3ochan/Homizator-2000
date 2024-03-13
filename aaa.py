@@ -1,4 +1,3 @@
-print("Welcome to the Homizator 2000")
 print(" @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@")
 print(" @,,,*,*(////////,*,/,,,*,,,,,,,,,,,,,,,,,,,/,,,,****,,,,,,,,,,.   @")
 print(" @,,,*//////////((((((////////////*,,,,,,,,,/,,,,****,,,,,,,,,,.   @")
@@ -27,6 +26,7 @@ print(" @**,***,*,///////@@@@&%#,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,(((((((((,,@")
 print(" @**,***,*,////////@&%#(((((((((#((((((((((((((((((((((((((((((*.,,@")
 print(" @**,***,*,//********#((((((((((((((((((((((((((((((((((((((,***.,,@")
 print(" @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@")
+print("Welcome to the Homizator 2000")
 
 # =====Initialisation=====
 #Format jour
@@ -60,13 +60,13 @@ conso = 8
 datatype_dictionnary = {
     0 : "null",
     1 : "Temperature",
-    2 : "Luminosité",
-    3 : "Taux d'humidité",
-    4 : "Niveau de CO2",
-    5 : "Qualité de l'air",
-    6 : "Niveau sonore", 
-    7 : "Pression atmosphérique",
-    8 : "Consommation d'énergie" 
+    2 : "Brightness",
+    3 : "Humidity",
+    4 : "CO2 Level",
+    5 : "Air quality",
+    6 : "Sound level", 
+    7 : "Atmospheric pressure",
+    8 : "Energy consumption" 
 }
 
 datatype_mapping = {
@@ -83,29 +83,35 @@ datatype_mapping = {
 
 datatype = null
 
+#Machine état annulation commande
 cancel = 0
 
 #Format stockage des données (pour le moment)
 main_data = []
 main_dataInstant = (date, time, sensorID, sensor_value, datatype_dictionnary[datatype])
-#commandes d'aides
+
+
+#=====commandes d'aides=====
 def help_datatypes():
-    print("Voici les différents types de données enregistrés.")
+    print("Here are all the supported data types, the data type field is required to insert new data.")
     print(" ")
     print(" ")
     print("+----------------+-------------------------+-------+-----------------------------------------+")
-    print("| Champ datatype | Type de donnée          | Unité | Description                             |")
+    print("| Data type field | Data type              | Unit  | Description                             |")
     print("+----------------+-------------------------+-------+-----------------------------------------+")
-    print("| null           | Aucun                   | N/A   | Aucune donnée disponible                |")
-    print("| temp           | Température             | °C    | Mesure de la température ambiante       |")
-    print("| lum            | Luminosité              | Lux   | Niveau d'éclairage mesuré               |")
-    print("| hum            | Taux d'humidité         | %     | Pourcentage d'humidité dans l'air       |")
-    print("| co2            | Niveau de CO2           | ppm   | Concentration de CO2 dans l'air         |")
-    print("| air            | Qualité de l'air        | AQI   | Indice de qualité de l'air              |")
-    print("| son            | Niveau sonore           | dB    | Niveau de bruit ambiant                 |")
-    print("| atm            | Pression atmosphérique  | hPa   | Pression de l'air mesurée               |")
-    print("| conso          | Consommation d'énergie  | kWh   | Quantité d'énergie consommée            |")
+    print("| null           | None                    | N/A   | No data available                       |")
+    print("| temp           | Temperature             | °C    | Measurement of ambient temperature      |")
+    print("| lum            | Luminosity              | Lux   | Measured level of lighting              |")
+    print("| hum            | Humidity rate           | %     | Percentage of humidity in the air       |")
+    print("| co2            | CO2 level               | ppm   | CO2 concentration in the air            |")
+    print("| air            | Air quality             | AQI   | Air quality index                       |")
+    print("| son            | Sound level             | dB    | Ambient noise level                     |")
+    print("| atm            | Atmospheric pressure    | hPa   | Measured air pressure                   |")
+    print("| conso          | Energy consumption      | kWh   | Amount of energy consumed               |")
     print("+----------------+-------------------------+-------+-----------------------------------------+")
+
+
+
 
 #Ajotuer manuellement une donnée au tableau
 def add_data():
@@ -122,7 +128,7 @@ def add_data():
     main_data.append(main_dataInstant)
     print("New data has been stored in database.")
     print(main_data[-1])
-    print("executez ................... pour voir les données")
+    print("Execute show data to see all entries")
 
 
 def def_date():
@@ -192,7 +198,7 @@ def def_datatype():
     global datatype, cancel
     if cancel == 1:
         return
-    datatype_input = input("Donne type de donnée, executez help_datatypes pour avoir une liste des types de données.")
+    datatype_input = input("Enter data type, help datatypes for more info")
     if datatype == "quit":
         cancel = 1
         return
@@ -200,13 +206,13 @@ def def_datatype():
     if datatype_input in datatype_mapping:
         datatype = datatype_mapping[datatype_input]
     else:
-        print("Type de donnée inconnu. Merci de réessayer")
+        print("Unknown data type. Please try again")
         help_datatypes
         def_datatype
         
 def showData():
     if not main_data:
-        print("Aucune donnée à afficher.")
+        print("No data to show.")
         return
 
     for entry_no, data in enumerate(main_data, start=1):
@@ -238,10 +244,11 @@ def process_command(input_command):
         print("Unknown command")
 # Boucle principale pour lire les commandes de l'utilisateur
 while True:
-    user_input = input("Entrez votre commande : ")
+    user_input = input("Enter command, help to display help : ")
     if user_input == "quit":
         break
     process_command(user_input)
 
 
 print("Goodbye !")
+print("Thanks for trying Homizator 2000 !")
