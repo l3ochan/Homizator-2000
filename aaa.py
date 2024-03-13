@@ -40,6 +40,18 @@ datatype_dictionnary = {
     8 : "Consommation d'énergie" 
 }
 
+datatype_mapping = {
+    "null": null,
+    "temp": temp,
+    "lum": lum,
+    "hum": hum,
+    "co2": co2,
+    "air": air,
+    "son": son,
+    "atm": atm,
+    "conso": conso
+}
+
 datatype = null
 
 cancel = 0
@@ -155,19 +167,7 @@ def def_datatype():
     if datatype == "quit":
         cancel = 1
         return
-    datatype_mapping = {
-        "null": null,
-        "temp": temp,
-        "lum": lum,
-        "hum": hum,
-        "co2": co2,
-        "air": air,
-        "son": son,
-        "atm": atm,
-        "conso": conso
-    }
-
-    # Utilise le mapping pour obtenir la valeur entière correspondante
+    # Utilise le dico datatype_mapping pour obtenir la valeur entière numérique correspondante (multilanguage)
     if datatype_input in datatype_mapping:
         datatype = datatype_mapping[datatype_input]
     else:
