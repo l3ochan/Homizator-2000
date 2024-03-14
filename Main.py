@@ -44,6 +44,7 @@ time = (hours,minutes,seconds)
 #Format sensor
 sensorID = "FfFF6f"
 sensor_value = 45.2
+sensorData=(sensorID,sensor_value)
 
 #Types de données, stockage sous forme de 
 #dictionnaire pour identifier les données par un id
@@ -88,8 +89,8 @@ cancel = 0
 
 #Format stockage des données (pour le moment)
 main_data = []
-main_dataInstant = (date, time, sensorID, sensor_value, datatype_dictionnary[datatype])
-#
+main_dataInstant = ()
+
 
 #=====commandes d'aides=====
 def help_datatypes():
@@ -114,16 +115,15 @@ def help_datatypes():
 
 
 #Ajotuer manuellement une donnée au tableau
-def add_data():
-    global cancel
-    cancel = 0
+def add_data():  
     def_date()
     def_time()
     def_sensorData()
     def_datatype()
     if cancel == 1:
         print("quit !")
-        return
+        return (cancel)
+    sensorID,sensor_value = sensorData
     main_dataInstant = (date, time, sensorID, sensor_value, datatype_dictionnary[datatype])
     main_data.append(main_dataInstant)
     print("New data has been stored in database.")
@@ -132,74 +132,73 @@ def add_data():
 
 
 def def_date():
-    global date, cancel
-    date_box = input("Donne date avec ce format jj/mm/aaaa")
+    global cancel,date
+    date_box = input("Input time with format jj/mm/aaaa")
     if date_box == "quit":
         cancel = 1
-        return
+        return 
     day,month,year = date_box.split('/') #Séparation des données entrées par l'utilisateur
     day = int(day)
     month = int(month)
     year = int(year)
     if not (1 <= day <= 31):
-        print("La date n'est pas comprise entre 1 et 31 ! Merci de réessayer")
+        print("Date is not between 1 and 31 ! Please verify your input.")
         def_date()
         return 
     if not (1 <= month <= 12):
-        print("Le mois n'est pas compris entre 1 et 12 ! Merci de réessayer")
+        print("Month is not between 1 and 12 ! Please verify your input.")
         def_date()
         return 
     date = (day,month,year)
-    return 
+    return
     
 def def_time():  
-    global time, cancel
+    global cancel,time
     if cancel == 1:
         return
-    time_box = input("Donne date avec ce format hh:mm:ss")
+    time_box = input("Input time with format hh:mm:ss")
     if time_box == "quit":
         cancel = 1
-        return
+        return 
     hours,minutes,seconds = time_box.split(':')
     hours = int(hours)
     minutes = int(minutes)
     seconds = int(seconds)
     if not (1 <= hours <= 24):
-        print("Il n'y a que 24h dans une journée ! Merci de réessayer")
+        print("There's only 24hrs in one day. Please verify your input.")
         def_time()
         return 
     if not (0 <= minutes < 60):
-        print("Les minutes ne sont pas comprises entre 1 et 60 ! Merci de réessayer")
+        print("Minutes are note between 1 and 60 ! Please verify your input.")
         def_time()
         return 
     if not (0 <= seconds < 60):
-        print("Les secondes ne sont pas comprises entre 1 et 60 ! Merci de réessayer")
+        print("Seconds are note between 1 and 60 ! Please verify your input.")
         def_time()
         return 
     time = (hours,minutes,seconds)
-    return 
+    return
 
 def def_sensorData():
-    global cancel
+    global cancel,sensor_value,sensorID
     if cancel == 1:
         return
-    global sensorID, sensor_value, datatype
-    sensorID = input("Donne identifiant sensor")
+    sensorID = input("Input sensorID")
     if sensorID == "quit":
         cancel = 1
-        return
-    sensor_value = input("donne valeur du capteur")
+        return 
+    sensor_value = input("Input sensor value")
     if sensor_value == "quit":
         cancel = 1
-        return
-    return 
+        return 
+    return
 
 def def_datatype():
-    global datatype, cancel
+    global cancel,datatype
     if cancel == 1:
         return
-    datatype_input = input("Enter data type, help datatypes for more info")
-    if datatype == "quit":
+    datatype_input = input("Enter data type, type 'help datatypes' for more info")
+    if datatype_input == "quit":
         cancel = 1
         return
     # Utilise le dico datatype_mapping pour obtenir la valeur entière numérique correspondante (multilanguage)
@@ -207,16 +206,19 @@ def def_datatype():
         datatype = datatype_mapping[datatype_input]
     else:
         print("Unknown data type. Please try again")
-        help_datatypes
-        def_datatype
+        help_datatypes()
+        def_datatype()
+    
         
 def showData():
+    #Si aucunes données à montrer, afficher un message d'erreur
     if not main_data:
         print("No data to show.")
         return
 
     for entry_no, data in enumerate(main_data, start=1):
-        date, time, sensorID, sensor_value, datatype = data
+        #Affichage 'sexy'
+        date, time, sensorID, sensor_value, datatype = data #déballage de tuple
         print(f"Entry #{entry_no}:")
         print(f"  Date: {date[0]}/{date[1]}/{date[2]}")
         print(f"  Time: {time[0]}:{time[1]}:{time[2]}")
@@ -242,9 +244,10 @@ def process_command(input_command):
         commands[input_command]()
     else:
         print("Unknown command")
+
 # Boucle principale pour lire les commandes de l'utilisateur
 while True:
-    user_input = input("Enter command, help to display help : ")
+    user_input = input("Enter command, 'help' to display help : ")
     if user_input == "quit":
         break
     process_command(user_input)
