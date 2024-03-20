@@ -83,11 +83,11 @@ datatype_mapping = {
     "conso": conso
 }
 column_index = {
-    0 : "date",
-    1 : "time",
-    2 : "sensorID",
-    3 : "sensor_value",
-    4 : "datatype",
+    'date': 0,
+    'time': 1,
+    'sensorID': 2,
+    'sensor_value': 3,
+    'datatype': 4
 }
 
 datatype = null
@@ -102,7 +102,7 @@ main_dataInstant = ()
 
 #=====commandes d'aides=====
 def help(type):
-    if help.type == "datatype":
+    if type == "datatype":
         print("Here are all the supported data types, the data type field is required to insert new data.")
         print(" ")
         print(" ")
@@ -127,7 +127,7 @@ def help(type):
         print(" ")
         print("Supported parameters: ")
         print(" ")
-        print("help : Return the general help section")
+        print("help general: Returns the general help section")
         print(" ")
         print ("help datatypes : Returns type of data supported")
         print(" ")
@@ -290,12 +290,9 @@ def showData():
 
 def SortEntries(Filtertype,value):
     sorted_main_data=[]
-    Filtertype=column_index[column_index]
-    
-    for entry_no, data_sort in enumerate(main_data, start=1):
-        date, time, sensorID, sensor_value, datatype = data_sort
-        if Filtertype == value:
-            sorted_main_data.append(entry_no)
+    Filtertype=column_index[Filtertype]
+    print(Filtertype)
+    sorted_main_data = [(line for line in main_data if line[Filtertype] == value)]
     for entry_no, data in enumerate(sorted_main_data, start=1):
         #Affichage 'sexy'
         date, time, sensorID, sensor_value, datatype = data #déballage de tuple
@@ -312,7 +309,6 @@ def SortEntries(Filtertype,value):
 # =====friendly commands===== 
 # Définir les commandes et indiquer si elles acceptent des paramètres (True) ou non (False)
 commands = {
-    
     "add data": (add_data, False),
     "show data": (showData, False),
     "debug add": (add_data_debug, True),
@@ -322,35 +318,36 @@ commands = {
 
 def process_command(input_command):
     parts = input_command.split(' ')
+    found_command = None
     params = []
 
-    # Essayer de correspondre la commande entière d'abord
-    full_command = ' '.join(parts)
-    if full_command in commands:
-        func, accepts_params = commands[full_command]
-        if accepts_params and len(params) > 0:
-            func(*params)
-        else:
-            func()
-        return
+    # Identifier la commande la plus longue qui correspond
+    for cmd in sorted(commands.keys(), key=len, reverse=True):
+        if input_command.startswith(cmd):
+            found_command = cmd
+            break
 
-    # Si la commande entière ne correspond pas, chercher avec le premier mot
-    for i in range(len(parts), 0, -1):
-        possible_command = ' '.join(parts[:i])
-        if possible_command in commands:
-            func, accepts_params = commands[possible_command]
-            params = parts[i:]
-            if accepts_params:
+    if found_command:
+        func, accepts_params = commands[found_command]
+        # Extraire les paramètres si présents
+        if len(input_command) > len(found_command):
+            # Assurez-vous qu'il y a un espace après la commande avant de prendre des paramètres
+            if input_command[len(found_command)] == ' ':
+                params = input_command[len(found_command)+1:].split(' ')
+        
+        # Exécuter la commande avec ou sans paramètres selon le cas
+        if accepts_params:
+            if len(params) == 0:
+                print(f"Error: Missing required parameter for command '{found_command}'.")
+            else:
                 func(*params)
+        else:
+            if len(params) > 0:
+                print(f"Error: Command '{found_command}' does not accept parameters.")
             else:
                 func()
-            return
-
-    # Si aucune correspondance n'est trouvée
-    print("Unknown command")
-
-# Note : Cette version itère sur les parties de la commande pour trouver une correspondance,
-# permettant de gérer des commandes de plusieurs mots avec ou sans paramètres.
+    else:
+        print("Unknown command")
 
 
 # Boucle principale pour lire les commandes de l'utilisateur
