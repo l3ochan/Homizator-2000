@@ -1,3 +1,4 @@
+# Léonard fait toujours des usines à gaz.
 import random
 print(" @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@")
 print(" @,,,*,*(////////,*,/,,,*,,,,,,,,,,,,,,,,,,,/,,,,****,,,,,,,,,,.   @")
@@ -59,7 +60,7 @@ son = 6
 atm = 7
 conso = 8
 
-datatype_dictionnary = {
+datatypeDictionnary = {
     0 : "null",
     1 : "Temperature",
     2 : "Brightness",
@@ -71,7 +72,7 @@ datatype_dictionnary = {
     8 : "Energy consumption" 
 }
 
-datatype_mapping = {
+datatypeMapping = {
     "null": null,
     "temp": temp,
     "lum": lum,
@@ -82,7 +83,7 @@ datatype_mapping = {
     "atm": atm,
     "conso": conso
 }
-column_index = {
+columnIndex = {
     'date': 0,
     'time': 1,
     'sensorID': 2,
@@ -90,14 +91,16 @@ column_index = {
     'datatype': 4
 }
 
+filtered = 0
 datatype = null
 
 #Machine état annulation commande
-cancel = 0
+cancel = False
 
 #Format stockage des données (pour le moment)
-main_data = []
-main_dataInstant = ()
+mainData = []
+mainDataInstant = ()
+sorted_mainData = []
 
 
 #=====commandes d'aides=====
@@ -138,25 +141,25 @@ def help(type):
 
 
 #Ajotuer manuellement une donnée au tableau
-def add_data():  
+def addData():  
     date = def_date()
     time = def_time()
     sensorData = def_sensorData()
     datatype = def_datatype()
 #    print(date)
-    if cancel == 1:
+    if cancel:
         print("canceled !")
         return (cancel)
     sensorID,sensor_value = sensorData
-    main_dataInstant = (date, time, sensorID, sensor_value, datatype_dictionnary[datatype])
-    main_data.append(main_dataInstant)
+    mainDataInstant = (date, time, sensorID, sensor_value, datatypeDictionnary[datatype])
+    mainData.append(mainDataInstant)
     print("New data has been stored in database.")
-    print(f"Entry #{len(main_data)}:")
+    print(f"Entry #{len(mainData)}:")
     print(f"  Date: {date[0]}/{date[1]}/{date[2]}")
     print(f"  Time: {time[0]}:{time[1]}:{time[2]}")
     print(f"  Sensor ID: {sensorID}")
     print(f"  Value: {sensor_value}")
-    print(f"  Data Type: {datatype_dictionnary[datatype]}")
+    print(f"  Data Type: {datatypeDictionnary[datatype]}")
     print("-----")
     print("Execute 'show data' to see all entries")
 
@@ -169,32 +172,32 @@ def add_data_debug(debug_revolutions): #Petit script pour générer X entrées a
         print("Revolutions number is not an integer")
         return
     debug_repetitions = 0
-    while debug_repetitions != debug_revolutions:
+    while debug_repetitions != debug_revolutions: #valeurs aléatoires pour l'heure, le jour et les données capteur
         date = random.randint(0,30),random.randint(1,12),random.randint(1970,2077)
         time = random.randint(0,24),random.randint(0,60),random.randint(0,60)
-        sensorID = random.choice(['Office','Living room','Entry','Toilet','Garage','Bathroom','Kitchen'])
+        sensorID = random.choice(['Office','Living_room','Entry','Toilet','Garage','Bathroom','Kitchen'])
         sensor_value = random.randint(0,150)
-        datatype=random.choice(list(datatype_mapping.values()))
-        main_dataInstant = (date, time, sensorID, sensor_value, datatype_dictionnary[datatype])
-        main_data.append(main_dataInstant)
+        datatype=random.choice(list(datatypeMapping.values()))
+        mainDataInstant = (date, time, sensorID, sensor_value, datatypeDictionnary[datatype])
+        mainData.append(mainDataInstant)
         print("New data has been stored in database.")
-        print(f"Entry #{len(main_data)}:")
+        print(f"Entry #{len(mainData)}:")
         print(f"  Date: {date[0]}/{date[1]}/{date[2]}")
         print(f"  Time: {time[0]}:{time[1]}:{time[2]}")
         print(f"  Sensor ID: {sensorID}")
         print(f"  Value: {sensor_value}")
-        print(f"  Data Type: {datatype_dictionnary[datatype]}")
+        print(f"  Data Type: {datatypeDictionnary[datatype]}")
         print("-----")
         print("Execute 'show data' to see all entries")
         debug_repetitions+=1
     print(f"Debug loop successfully executed {debug_repetitions} times.")
     return
 
-def def_date():
+def def_date(): #On donne la date
     global cancel
     date_box = input("Input time with format jj/mm/aaaa, type cancel to cancel")
     if date_box == "cancel":
-        cancel = 1
+        cancel = True
         return 
     day,month,year = date_box.split('/') #Séparation des données entrées par l'utilisateur
     day = int(day)
@@ -211,13 +214,13 @@ def def_date():
     date = (day,month,year)
     return date
     
-def def_time():  
+def def_time():  #On donne l'heure
     global cancel
-    if cancel == 1:
+    if cancel:
         return
     time_box = input("Input time with format hh:mm:ss")
     if time_box == "cancel":
-        cancel = 1
+        cancel = True
         return 
     hours,minutes,seconds = time_box.split(':')
     hours = int(hours)
@@ -238,46 +241,63 @@ def def_time():
     time = (hours,minutes,seconds)
     return time
 
-def def_sensorData():
+def def_sensorData():#On donne les infos du capteur
     global cancel
-    if cancel == 1:
+    if cancel:
         return
     sensorID = input("Input sensorID")
     if sensorID == "cancel":
-        cancel = 1
+        cancel = True
         return 
     sensor_value = input("Input sensor value")
     if sensor_value == "cancel":
-        cancel = 1
+        cancel = True
         return 
     sensorData = (sensor_value,sensorID)
     return sensorData
 
-def def_datatype():
+def def_datatype():# on définit le type de donnée
     global cancel
-    if cancel == 1:
+    if cancel:
         return
     datatype_input = input("Enter data type, type 'help datatypes' for more info")
     if datatype_input == "cancel":
-        cancel = 1
+        cancel = True
         return
-    # Utilise le dico datatype_mapping pour obtenir la valeur entière numérique correspondante (multilanguage)
-    if datatype_input in datatype_mapping:
-        datatype = datatype_mapping[datatype_input]
+    # Utilise le dico datatypeMapping pour obtenir la valeur entière numérique correspondante (multilanguage)
+    if datatype_input in datatypeMapping:
+        datatype = datatypeMapping[datatype_input]
     else:
         print("Unknown data type. Please try again")
         help(datatype)
         def_datatype()
     return datatype
-    
+
+#=====Controleurs=====
+def sortSystem(filtertype,value):
+    sorted_mainData = sortEntries(filtertype,value)
+    showData(sorted_mainData)
+    return
+
+
+#Filtrer les colonnes du tableau
+def sortEntries(filtertype,value): #Entrée de la colonne (filtertype) et de la valeur souhaitée (ex bureau)
+    if filtertype not in columnIndex:
+        print("Unknown Filter")
+        return
+    else:
+        filtertype=columnIndex[filtertype]
+        print(filtertype)
+        #On retourne le tableau trié pour l'assigner à une variable dans sortSytem()
+    return [line for line in mainData if line[filtertype].lower() == value.lower()] 
         
-def showData():
+def showData(data=None):
+    dataSource = data if data is not None else mainData
     #Si aucunes données à montrer, afficher un message d'erreur
-    if not main_data:
+    if not dataSource:
         print("No data to show.")
         return
-
-    for entry_no, data in enumerate(main_data, start=1):
+    for entry_no, data in enumerate(dataSource, start=1):
         #Affichage 'sexy'
         date, time, sensorID, sensor_value, datatype = data #déballage de tuple
         print(f"Entry #{entry_no}:")
@@ -287,32 +307,15 @@ def showData():
         print(f"  Value: {sensor_value}")
         print(f"  Data Type: {datatype}")
         print("-----")
-
-def SortEntries(Filtertype,value):
-    sorted_main_data=[]
-    Filtertype=column_index[Filtertype]
-    print(Filtertype)
-    sorted_main_data = [(line for line in main_data if line[Filtertype] == value)]
-    for entry_no, data in enumerate(sorted_main_data, start=1):
-        #Affichage 'sexy'
-        date, time, sensorID, sensor_value, datatype = data #déballage de tuple
-        print(f"Entry #{entry_no}:")
-        print(f"  Date: {date[0]}/{date[1]}/{date[2]}")
-        print(f"  Time: {time[0]}:{time[1]}:{time[2]}")
-        print(f"  Sensor ID: {sensorID}")
-        print(f"  Value: {sensor_value}")
-        print(f"  Data Type: {datatype}")
-        print("-----")
-
-
+    return 
 
 # =====friendly commands===== 
 # Définir les commandes et indiquer si elles acceptent des paramètres (True) ou non (False)
 commands = {
-    "add data": (add_data, False),
+    "add data": (addData, False),
     "show data": (showData, False),
     "debug add": (add_data_debug, True),
-    "show data sort": (SortEntries, True),  # Cette fonction accepte des paramètres
+    "show data filter": (sortSystem, True),  # Cette fonction accepte des paramètres
     "help" : (help, True),
 }
 
@@ -347,13 +350,13 @@ def process_command(input_command):
             else:
                 func()
     else:
-        print("Unknown command")
+        print("Unknown command, for a list of commands, type 'help'.")
 
 
 # Boucle principale pour lire les commandes de l'utilisateur
 while True:
     user_input = input("Enter command, 'help general' to display help, 'help imnew' to display beginners's guide : ")
-    if user_input == "quit":
+    if user_input == "exit":
         break
     process_command(user_input)
 
