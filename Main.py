@@ -59,7 +59,7 @@ air = 5
 son = 6
 atm = 7
 conso = 8
-
+# Dictionnaire des types de données, pourrait permettre le multilingue
 datatypeDictionnary = {
     0 : "null",
     1 : "Temperature",
@@ -71,7 +71,7 @@ datatypeDictionnary = {
     7 : "Atmospheric pressure",
     8 : "Energy consumption" 
 }
-
+# Mappage du paramètre que l'utilisateur rentrera lors de l'entrée d'une ligne
 datatypeMapping = {
     "null": null,
     "temp": temp,
@@ -83,6 +83,7 @@ datatypeMapping = {
     "atm": atm,
     "conso": conso
 }
+#Indexe des colonnes du tableau, aka ordre de stockage
 columnIndex = {
     'date': 0,
     'time': 1,
@@ -91,7 +92,7 @@ columnIndex = {
     'datatype': 4
 }
 
-filtered = 0
+
 datatype = null
 
 #Machine état annulation commande
@@ -122,22 +123,68 @@ def help(type):
         print("| atm            | Atmospheric pressure    | hPa   | Measured air pressure                   |")
         print("| conso          | Energy consumption      | kWh   | Amount of energy consumed               |")
         print("+----------------+-------------------------+-------+-----------------------------------------+")
-
     elif type == "general":
-        print("A rédiger")
-    else:
-        print("Unknown parameter")
+        print("==============================================")
+        print("         Welcome to the Help Section          ")
+        print("==============================================")
+        print("Here is a list of available commands and how to use them:")
         print(" ")
-        print("Supported parameters: ")
+        print("GENERAL:")
+        print("  exit - Closes the application.")
+        print("  help general - Displays this help section.")
+        print("  help datatypes - Displays the different types of data that you can record.")
         print(" ")
-        print("help general: Returns the general help section")
+        print("ADDING DATA:")
+        print("  add data - Allows you to manually add a data entry.")
+        print("    When this command is called, you will be prompted to enter:")
+        print("    - The date (format dd/mm/yyyy)")
+        print("    - The time (format hh:mm:ss)")
+        print("    - The sensor ID")
+        print("    - The value captured by the sensor")
+        print("    - The data type (temp, lum, etc.)")
         print(" ")
-        print ("help datatypes : Returns type of data supported")
+        print("DISPLAYING DATA:")
+        print("  show data - Displays all recorded data.")
         print(" ")
+        print("FILTERING AND SORTING DATA:")
+        print("  show data filter [sensor type] [value] - Displays data filtered based on the sensor type and specified value.")
+        print("    Example: 'show data filter sensorID Office' will display all data where the sensor ID is 'Office'.")
+        print(" ")
+        print("DEBUG MODE (Quick Data Addition):")
+        print("  debug add [number] - Automatically generates and adds a specified number of random data entries.")
+        print("    Example: 'debug add 10' will add 10 new random data entries.")
+        print(" ")
+        print("Note: Parameters in brackets '[]' should be replaced with your specific values when using the commands.")
+    elif type == "imnew":
+        print("========================================================")
+        print("      Welcome to Homizator 2000 - Beginner's Guide      ")
+        print("========================================================")
+        print(" ")
+        print("Homizator 2000 is your comprehensive solution for managing and analyzing sensor data. Whether you're tracking temperature, brightness, or air quality, Homizator 2000 makes data handling effortless. Here’s how to get started:")
+        print(" ")
+        print("1. ADDING DATA")
+        print("To begin recording sensor data, use the 'add data' command. You'll be prompted to enter details step by step:")
+        print("  - Date in dd/mm/yyyy format. For example, '24/12/2024'.")
+        print("  - Time in hh:mm:ss format. Such as '12:57:56'.")
+        print("  - Sensor ID, which could be a specific name or location like 'Office'.")
+        print("  - The sensor's value, a numerical data point that the sensor records.")
+        print("  - Data type, which describes the nature of the data (e.g., 'temp' for temperature).")
+        print(" ")
+        print("2. VIEWING DATA")
+        print("After adding data, you can view all entries by using the 'show data' command. This will display all recorded entries in a structured format, showcasing the date, time, sensor ID, value, and data type.")
+        print(" ")
+        print("3. FILTERING DATA")
+        print("If you're looking for specific information, 'show data filter' allows you to narrow down entries based on sensor type and value. For instance, to view all entries from the 'Office' sensor, you'd use:")
+        print("  show data filter sensorID Office")
+        print(" ")
+        print("4. GETTING HELP")
+        print("Need a refresher on commands or data types? 'help general' provides an overview of all commands, while 'help datatypes' lists all supported data types and their descriptions.")
+        print(" ")
+        print("5. EXITING THE PROGRAM")
+        print("When you're done, simply type 'exit' to close Homizator 2000.")
+        print(" ")
+        print("We hope this guide helps you get started smoothly. Happy data tracking!")
     return None
-
-        
-
 
 
 #Ajotuer manuellement une donnée au tableau
