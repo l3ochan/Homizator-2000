@@ -29,7 +29,7 @@ print(" @**,***,*,////////@&%#(((((((((#((((((((((((((((((((((((((((((*.,,@")
 print(" @**,***,*,//********#((((((((((((((((((((((((((((((((((((((,***.,,@")
 print(" @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@")
 print("Welcome to the Homizator 2000")
-
+print("Enter command, 'help general' to display help, 'help imnew' to display beginners's guide : ")
 # =====Initialisation=====
 #Format jour
 day = 24
@@ -71,6 +71,8 @@ datatypeDictionnary = {
     7 : "Atmospheric pressure",
     8 : "Energy consumption" 
 }
+
+
 # Mappage du paramètre que l'utilisateur rentrera lors de l'entrée d'une ligne
 datatypeMapping = {
     "null": null,
@@ -102,6 +104,7 @@ cancel = False
 mainData = []
 mainDataInstant = ()
 sorted_mainData = []
+Filtered = False 
 
 
 #=====commandes d'aides=====
@@ -322,19 +325,57 @@ def def_datatype():# on définit le type de donnée
 
 #=====Controleurs=====
 def sortSystem(filtertype,value):
-    sorted_mainData = sortEntries(filtertype,value)
+    sorted_mainData = filterEntries(filtertype,value)
     showData(sorted_mainData)
     return
 
+def showDataFiltered():
+    global filtered
+    if filtered:
+        showData(sorted_mainData)
+    else:
+        print("No filters applied, run 'show data filtered <Column> <Value>' to set one up")
+    
+def clearFilters():
+    global filtered
+    if filtered:
+        dialog = input("Are you sure you want to clear filters")
+        if dialog == "cancel":
+            return 
+        elif dialog == "yes":
+            sorted_mainData = []
+            print("Successfully cleared filters")
+            filtered = False
+            return
+        elif dialog == "no":
+            print("Canceled !")
+            return
+        else:
+            print("Invalid entry")
+            clearFilters()
+            return 
+    else:
+        print("No filters applied!")
+        
+
 
 #Filtrer les colonnes du tableau
-def sortEntries(filtertype,value): #Entrée de la colonne (filtertype) et de la valeur souhaitée (ex bureau)
+def filterEntries(filtertype,value): #Entrée de la colonne (filtertype) et de la valeur souhaitée (ex bureau)
+    global filtered
     if filtertype not in columnIndex:
         print("Unknown Filter")
         return
+    elif filtertype == columnIndex["datatype"]:
+        if value not in datatypeMapping:
+            print("Unknown data type. Please try again")
+            help(datatype)
+        else:
+            filtertype=columnIndex[filtertype]
+            value = datatypeMapping[value]
+            value = datatypeDictionnary[value]
     else:
         filtertype=columnIndex[filtertype]
-        print(filtertype)
+        #print(filtertype)
         #On retourne le tableau trié pour l'assigner à une variable dans sortSytem()
     return [line for line in mainData if line[filtertype].lower() == value.lower()] 
         
@@ -354,7 +395,13 @@ def showData(data=None):
         print(f"  Value: {sensor_value}")
         print(f"  Data Type: {datatype}")
         print("-----")
+        filtered = True
     return 
+
+#Parce que vscode c'est de la merde
+def update_screen():
+    print("Updated !")
+    return None
 
 # =====friendly commands===== 
 # Définir les commandes et indiquer si elles acceptent des paramètres (True) ou non (False)
@@ -364,6 +411,9 @@ commands = {
     "debug add": (add_data_debug, True),
     "show data filter": (sortSystem, True),  # Cette fonction accepte des paramètres
     "help" : (help, True),
+    "update screen" : (update_screen, False),
+    "show data filtered": (showDataFiltered, False),
+    "clear filters": (clearFilters, False),
 }
 
 def process_command(input_command):
@@ -402,7 +452,7 @@ def process_command(input_command):
 
 # Boucle principale pour lire les commandes de l'utilisateur
 while True:
-    user_input = input("Enter command, 'help general' to display help, 'help imnew' to display beginners's guide : ")
+    user_input = input(">")
     if user_input == "exit":
         break
     process_command(user_input)
