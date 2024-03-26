@@ -1,5 +1,5 @@
 # Léonard fait toujours des usines à gaz.
-import random
+import random,copy
 print(" @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@")
 print(" @,,,*,*(////////,*,/,,,*,,,,,,,,,,,,,,,,,,,/,,,,****,,,,,,,,,,.   @")
 print(" @,,,*//////////((((((////////////*,,,,,,,,,/,,,,****,,,,,,,,,,.   @")
@@ -103,7 +103,8 @@ cancel = False
 #Format stockage des données (pour le moment)
 mainData = []
 mainDataInstant = ()
-sorted_mainData = []
+filteredsorted_mainData = []
+sorting_mainData = []
 Filtered = False 
 
 
@@ -223,7 +224,7 @@ def add_data_debug(debug_revolutions): #Petit script pour générer X entrées a
         return
     debug_repetitions = 0
     while debug_repetitions != debug_revolutions: #valeurs aléatoires pour l'heure, le jour et les données capteur
-        date = random.randint(0,30),random.randint(1,12),random.randint(1970,2077)
+        date = random.randint(1,30),random.randint(1,12),random.randint(1970,2077)
         time = random.randint(0,24),random.randint(0,60),random.randint(0,60)
         sensorID = random.choice(['Office','Living_room','Entry','Toilet','Garage','Bathroom','Kitchen'])
         sensor_value = random.randint(0,150)
@@ -324,18 +325,43 @@ def def_datatype():# on définit le type de donnée
     return datatype
 
 #=====Controleurs=====
-def sortSystem(filtertype,value):
-    sorted_mainData = filterEntries(filtertype,value)
-    showData(sorted_mainData)
+def filterSystem(filtertype,value):
+    filteredsorted_mainData = filterEntries(filtertype,value)
+    showData(filteredsorted_mainData)
     return
+
+def sortSystem(order):
+    filteredsorted_mainData = sortEntries(order)
+    showData(filteredsorted_mainData)
+    return
+
+def compare_asc(date_time1, date_time2):
+    date1, time1 = date_time1
+    date2, time2 = date_time2
+    # Comparaison complète incluant les années et les secondes
+    return date1 < date2 or (date1 == date2 and time1 < time2)
+
+def compare_des(date_time1, date_time2):
+    date1, time1 = date_time1
+    date2, time2 = date_time2
+    # Comparaison complète incluant les années et les secondes
+    return date1 > date2 or (date1 == date2 and time1 > time2)
+
 
 def showDataFiltered():
     global filtered
     if filtered:
-        showData(sorted_mainData)
+        showData(filteredsorted_mainData)
     else:
-        print("No filters applied, run 'show data filtered <Column> <Value>' to set one up")
+        print("No filters applied, run 'show data filter <Column> <Value>' to set one up")
     
+def showDataSorted():
+    global filtered
+    if filtered:
+        showData(filteredsorted_mainData)
+    else:
+        print("Data is not sorted, run 'show data sort <Column> <Value>' to set one up")
+
 def clearFilters():
     global filtered
     if filtered:
@@ -343,7 +369,7 @@ def clearFilters():
         if dialog == "cancel":
             return 
         elif dialog == "yes":
-            sorted_mainData = []
+            filteredsorted_mainData = []
             print("Successfully cleared filters")
             filtered = False
             return
@@ -378,6 +404,53 @@ def filterEntries(filtertype,value): #Entrée de la colonne (filtertype) et de l
         #print(filtertype)
         #On retourne le tableau trié pour l'assigner à une variable dans sortSytem()
     return [line for line in mainData if line[filtertype].lower() == value.lower()] 
+
+
+#Trier dans l'ordre ascendant/descendant les colonnes du tableau
+def sortEntries(order): #Entrée de la colonne (filtertype) et de la valeur souhaitée (ex bureau)
+    global filtered
+    if order != "asc" or "des":
+        print("Unknown order")
+        return
+
+    elif order == "asc":
+        sorting_output = []
+        if filtered:
+            sorting_mainData = copy.deepcopy(filteredsorted_mainData)
+        else:
+            sorting_mainData = copy.deepcopy(mainData)
+        while sorting_mainData:
+            smallest = sorting_mainData[0]
+            for data in sorting_mainData:
+                if compare_asc(data[0], data[1], smallest[0], smallest[1]):
+                    smallest = data
+        sorting_output.append(smallest)
+        sorting_mainData.remove(smallest)
+        filteredsorted_mainData = sorting_output
+        filtered = True
+        return(filteredsorted_mainData)
+    elif order == "des":
+        sorting_output = []
+        if filtered:
+            sorting_mainData = copy.deepcopy(filteredsorted_mainData)
+        else:
+            sorting_mainData = copy.deepcopy(mainData)
+        while sorting_mainData:
+            smallest = sorting_mainData[0]
+            for data in sorting_mainData:
+                if compare_des(data[0], data[1], smallest[0], smallest[1]):
+                    smallest = data
+        sorting_output.append(smallest)
+        sorting_mainData.remove(smallest)
+        filteredsorted_mainData = sorting_output
+        filtered = True
+        return(filteredsorted_mainData)
+        #On retourne le tableau trié pour l'assigner à une variable dans sortSytem()
+    return (filteredsorted_mainData)
+
+
+
+
         
 def showData(data=None):
     dataSource = data if data is not None else mainData
@@ -395,7 +468,6 @@ def showData(data=None):
         print(f"  Value: {sensor_value}")
         print(f"  Data Type: {datatype}")
         print("-----")
-        filtered = True
     return 
 
 #Parce que vscode c'est de la merde
@@ -409,12 +481,14 @@ commands = {
     "add data": (addData, False),
     "show data": (showData, False),
     "debug add": (add_data_debug, True),
-    "show data filter": (sortSystem, True),  # Cette fonction accepte des paramètres
+    "data filter": (filterSystem, True),  # Cette fonction accepte des paramètres
+    "data sort": (sortSystem, True),
     "help" : (help, True),
-    "update screen" : (update_screen, False),
+    "update screen" : (update_screen, False), #cette fonction n'en accepte pas
     "show data filtered": (showDataFiltered, False),
     "clear filters": (clearFilters, False),
-}
+    "show data sorted" : (showDataSorted, False)
+    }
 
 def process_command(input_command):
     parts = input_command.split(' ')
