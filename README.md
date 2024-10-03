@@ -1,1 +1,1 @@
-F
+Projet pour un module de première année de BUT R&T dans lequel nous nous entrainons avec les dictionnaires, tuples et tableaux en python. Ce code sert à stocker des données de divers capteurs de domotique. Les données ne sont pas persistantes 
